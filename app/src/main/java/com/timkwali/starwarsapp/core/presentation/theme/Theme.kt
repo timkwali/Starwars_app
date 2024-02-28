@@ -1,4 +1,4 @@
-package com.timkwali.starwarsapp.ui.theme
+package com.timkwali.starwarsapp.core.presentation.theme
 
 import android.app.Activity
 import android.os.Build
