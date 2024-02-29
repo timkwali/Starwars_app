@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.timkwali.starwarsapp.details.presentation.screens.DetailsScreen
+import com.timkwali.starwarsapp.search.presentation.events.SearchEvent
 import com.timkwali.starwarsapp.search.presentation.screens.SearchScreen
 import com.timkwali.starwarsapp.search.presentation.viewmodel.SearchViewModel
 
@@ -21,16 +22,24 @@ fun AppNavHost(
             val searchViewModel = hiltViewModel<SearchViewModel>()
 
             SearchScreen(
-                searchState = searchViewModel.ss,
-                navigateToDetailsScreen = { navController.navigate(Screen.Details.route) },
+                searchState = searchViewModel.searchState,
+                navigateToDetailsScreen = { characterId ->
+                    navController.navigate("${Screen.Details.route}/$characterId")
+                },
                 searchCharacters = { searchQuery->
-                    searchViewModel.searchCharacters(searchQuery)
+                    searchViewModel.onEvent(SearchEvent.SearchCharacters(searchQuery))
                 }
             )
         }
 
-        composable(route = Screen.Details.route) {
-            DetailsScreen(navigateBack = { navController.popBackStack() })
+        composable(
+            route = "${Screen.Details.route}/{character_id}",
+        ) {
+            val characterId = it.arguments?.getString("character_id") ?: ""
+            DetailsScreen(
+                navigateBack = { navController.popBackStack() },
+                characterUrl = characterId
+            )
         }
     }
 }

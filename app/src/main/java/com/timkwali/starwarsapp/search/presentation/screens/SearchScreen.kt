@@ -1,6 +1,6 @@
 package com.timkwali.starwarsapp.search.presentation.screens
 
-import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,12 +18,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.timkwali.starwarsapp.search.domain.model.Character
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun SearchScreen(
     searchState: Flow<PagingData<Character>>,
-    navigateToDetailsScreen: () -> Unit,
+    navigateToDetailsScreen: (id: String) -> Unit,
     searchCharacters: (searchQuery: String) -> Unit
 ) {
     Surface(
@@ -42,14 +41,19 @@ fun SearchScreen(
 
             LazyColumn {
                 items(
-                    lazyPagingItems.itemCount,
-                    key = lazyPagingItems.itemKey { it }
+                    lazyPagingItems.itemCount
                 ) { index ->
 
                     val item = lazyPagingItems[index]
-                    Log.d("dfkaff", "----->$item")
-                    Text("Item is ${item?.name}")
-                    Spacer(modifier = Modifier.height(10.dp))
+                    if(item != null) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            "Item is ${item.name}",
+                            modifier = Modifier
+                                .clickable { navigateToDetailsScreen(item.id) }
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
                 }
             }
         }
