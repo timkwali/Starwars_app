@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.timkwali.starwarsapp.core.presentation.navigation.AppNavHost
+import com.timkwali.starwarsapp.search.presentation.viewmodel.SearchViewModel
 
 @Composable
 fun MainScreen() {

@@ -1,30 +1,57 @@
 package com.timkwali.starwarsapp.search.presentation.screens
 
-import androidx.compose.foundation.clickable
+import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import com.timkwali.starwarsapp.core.presentation.navigation.Screen
+import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import com.timkwali.starwarsapp.search.domain.model.Character
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavHostController) {
+fun SearchScreen(
+    searchState: Flow<PagingData<Character>>,
+    navigateToDetailsScreen: () -> Unit,
+    searchCharacters: (searchQuery: String) -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column {
-            Text(text = "Search", modifier = Modifier.clickable { navController.navigate(Screen.Details.route) })
-            TextField(value = "", onValueChange = {
+            Button(
+                onClick = {
+                    searchCharacters("l")
+                }) {
+                Text("Search")
+            }
 
-            })
+            val lazyPagingItems = searchState.collectAsLazyPagingItems()
+
+            LazyColumn {
+                items(
+                    lazyPagingItems.itemCount,
+                    key = lazyPagingItems.itemKey { it }
+                ) { index ->
+
+                    val item = lazyPagingItems[index]
+                    Log.d("dfkaff", "----->$item")
+                    Text("Item is ${item?.name}")
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
         }
     }
 }

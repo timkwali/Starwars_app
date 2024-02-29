@@ -10,11 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 
 @Composable
-fun DetailsScreen(navController: NavHostController) {
+fun DetailsScreen(
+    navigateBack: () -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Text(text = "Details", modifier = Modifier.clickable { navController.popBackStack() })
+        Text(text = "Details", modifier = Modifier.clickable { navigateBack() })
     }
 }
