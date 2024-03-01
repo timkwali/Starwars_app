@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Starwars app</string>
+    <string name="error_resource_not_found">Resource not found</string>
+    <string name="error_service_unavailable">Service unavailable</string>
+    <string name="error_server">Server error</string>
+    <string name="error_network_unavailable">Network unavailable</string>
+    <string name="error_general">Error fetching data</string>
 </resources>

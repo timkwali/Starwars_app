@@ -1,10 +1,13 @@
 package com.timkwali.starwarsapp.search.presentation.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.SavedStateHandle
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import com.timkwali.starwarsapp.core.utils.ErrorType
+import com.timkwali.starwarsapp.core.utils.ErrorTypeToErrorTextConverter
 import com.timkwali.starwarsapp.core.utils.Resource
 import com.timkwali.starwarsapp.core.utils.UiState
 import com.timkwali.starwarsapp.search.domain.model.character.Character
@@ -12,22 +15,21 @@ import com.timkwali.starwarsapp.search.domain.usecase.SearchStarwarsApi
 import com.timkwali.starwarsapp.search.presentation.events.SearchEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-    private val searchStarwarsApi: SearchStarwarsApi
+    private val searchStarwarsApi: SearchStarwarsApi,
+    private val errorTypeToErrorTextConverter: ErrorTypeToErrorTextConverter
 ): ViewModel() {
 
-    private var _characterState: UiState<Flow<PagingData<Character>>> =
-        UiState.Loaded(MutableSharedFlow())
-    val characterState: UiState<Flow<PagingData<Character>>> get() = _characterState
+    private var _characterState: MutableState<UiState<Flow<PagingData<Character>>>> =
+        mutableStateOf(UiState.Loaded(flowOf()))
+    val characterState: State<UiState<Flow<PagingData<Character>>>> = _characterState
 
     fun onEvent(event: SearchEvent) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -39,24 +41,23 @@ class SearchViewModel @Inject constructor(
 
     private suspend fun searchCharacters(searchQuery: String) {
         try {
-            searchStarwarsApi.invoke(searchQuery)
-//                .distinctUntilChanged()
-//                .cachedIn(viewModelScope)
-                .collect {
-                    Log.d("98454jfa", "resource-->${it}")
-                    _characterState = when(it) {
-                        is Resource.Success -> {
-                            UiState.Loaded(MutableStateFlow(it.data))
-                        }
-                        is Resource.Error -> UiState.Error("Error message")
-                        else -> UiState.Loading()
-                    }
-                }
+            _characterState.value = UiState.Loading()
+            delay(1000)
+            _characterState.value = when(val resource = searchStarwarsApi.invoke(searchQuery)) {
+                is Resource.Success -> UiState.Loaded(resource.data)
+                is Resource.Error -> UiState.Error(errorTypeToErrorTextConverter
+                    .convert(ErrorType.Api.ServiceUnavailable))
+                else -> UiState.Loading()
+            }
 
         } catch (e: Throwable) {
-            _characterState = UiState.Error(e.localizedMessage ?: "Error fetcing data custome")
+            _characterState.value = UiState.Error(
+                errorTypeToErrorTextConverter.convert(ErrorType.Api.Network)
+            )
         } catch (e: Exception) {
-            _characterState = UiState.Error(e.localizedMessage ?: "Error fetcing data exc")
+            _characterState.value = UiState.Error(
+                errorTypeToErrorTextConverter.convert(ErrorType.Unknown)
+            )
         }
     }
 }

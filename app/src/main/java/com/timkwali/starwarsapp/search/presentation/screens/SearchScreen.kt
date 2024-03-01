@@ -1,10 +1,8 @@
 package com.timkwali.starwarsapp.search.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,13 +17,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -66,15 +62,16 @@ fun SearchScreen(
     navigateToDetailsScreen: (id: String) -> Unit,
     searchCharacters: (searchQuery: String) -> Unit
 ) {
-    var dismissError by rememberSaveable { mutableStateOf(false) }
+    var showError by rememberSaveable { mutableStateOf(false) }
     val controller = LocalSoftwareKeyboardController.current
+    var showLoading by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(key1 = searchState) {
-        dismissError = false
+        showLoading = searchState is UiState.Loading
         if(searchState is UiState.Error) {
-            Log.d("98454jfa", "state-->${searchState}")
+            showError = true
             delay(3000)
-            dismissError = true
+            showError = false
         }
     }
     
@@ -85,128 +82,90 @@ fun SearchScreen(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter,
+            contentAlignment = Alignment.Center,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.background),
-                contentDescription = "background",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(it)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_star_wars),
-                    contentDescription = "starwars logo",
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(150.dp),
+                    painter = painterResource(id = R.drawable.background),
+                    contentDescription = "background",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
-                TextField(
-                    value = searchValue,
-                    onValueChange = { onSearchChange(it) },
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .border(width = 1.dp, color = Orange, shape = RoundedCornerShape(10.dp))
-                        .background(Color.Transparent),
-                    trailingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = "search icon", tint = Grey) },
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        cursorColor = Grey,
-                        textColor = White,
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_star_wars),
+                        contentDescription = "starwars logo",
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(150.dp),
+                    )
+                    TextField(
+                        value = searchValue,
+                        onValueChange = { onSearchChange(it) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .border(width = 1.dp, color = Orange, shape = RoundedCornerShape(10.dp))
+                            .background(Color.Transparent),
+                        trailingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = "search icon", tint = Grey) },
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            cursorColor = Orange,
+                            textColor = White,
 
-                    ),
-                    maxLines = 1,
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            controller?.hide()
-                            searchCharacters(searchValue)
-                        }
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search)
-                )
-
-                if(searchState is UiState.Loading) {
-                    CircularProgressIndicator(color = Orange)
-                }
-
-                if(searchState is UiState.Loaded) {
-//                    val lazyPagingItems = searchState.data.collectAsLazyPagingItems()
-                    val lazyPagingItems = listOf<Character>(
-                        Character(url = "url", name = "Nameytrtgujkhjghkhkjhkhkjhkhkhiuygfvghcvhgjgjgkhkhkhkggjgjg", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
-                        Character(url = "url", name = "Name", birthYear = "589YB"),
+                            ),
+                        placeholder = { Text(text = "Search Characters", style = typography.bodyLarge, color = Grey) },
+                        maxLines = 1,
+                        keyboardActions = KeyboardActions(
+                            onSearch = {
+                                controller?.hide()
+                                searchCharacters(searchValue)
+                            }
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search)
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
-                    LazyColumn {
-                        items(
-//                            lazyPagingItems.itemCount
-                            lazyPagingItems.size
-                        ) { index ->
-                            val item = lazyPagingItems[index]
-                            if(item != null) {
-                                Spacer(modifier = Modifier.height(10.dp))
-                                CharacterListItem(character = item) {
-                                    navigateToDetailsScreen(it.id)
+                    if(searchState is UiState.Loaded) {
+                        val lazyPagingItems = searchState.data.collectAsLazyPagingItems()
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                        LazyColumn {
+                            items(
+                                lazyPagingItems.itemCount
+                            ) { index ->
+                                val item = lazyPagingItems[index]
+                                if(item != null) {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    CharacterListItem(character = item) {
+                                        navigateToDetailsScreen(it.id)
+                                    }
+                                    Spacer(modifier = Modifier.height(10.dp))
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
                             }
                         }
                     }
                 }
+
+                if(searchState is UiState.Error) {
+                    SimpleSnackbar(
+                        message = searchState.error.asString(),
+                        isVisible = showError
+                    )
+                }
             }
 
-            if(searchState is UiState.Error) {
-                Log.d("98454jfa", "UiError->${searchState.error}")
-                SimpleSnackbar(
-                    message = searchState.error,
-                    isVisible = dismissError
-                )
+            if(showLoading) {
+                CircularProgressIndicator(color = Orange)
             }
         }
     }

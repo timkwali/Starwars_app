@@ -19,7 +19,7 @@ interface StarwarsApi {
     suspend fun searchStarwarsApi(
         @Query(SEARCH_QUERY) searchQuery: String,
         @Query(PAGE_QUERY) page: Int
-    ): Response<SearchResponse>
+    ): SearchResponse
 
     @GET("$CHARACTER_ENDPOINT/{id}")
     suspend fun getCharacterDetail(

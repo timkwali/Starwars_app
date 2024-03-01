@@ -1,40 +1,32 @@
 package com.timkwali.starwarsapp.search.data.pagination
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.timkwali.starwarsapp.core.data.remote.StarwarsApi
-import com.timkwali.starwarsapp.core.data.remote.model.response.search.Result
 import com.timkwali.starwarsapp.core.utils.Constants.FIRST_PAGE_INDEX
+import com.timkwali.starwarsapp.search.domain.model.character.Character
+import com.timkwali.starwarsapp.search.domain.model.character.CharacterMapper
 import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class CharactersPagingSource @Inject constructor(
     private val searchQuery: String,
     private val starwarsApi: StarwarsApi,
-): PagingSource<Int, Result>() {
+): PagingSource<Int, Character>() {
 
-    init {
-        Log.d("98454jfa", "in init")
-    }
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Result> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
         return try {
-            Log.d("98454jfa", "inload")
             val position = params.key ?: FIRST_PAGE_INDEX
-            val results: List<Result>
-            val response = starwarsApi.searchStarwarsApi(searchQuery, position)
-
-            if(response.isSuccessful) {
-                results = response.body()?.results?.filterNotNull() ?: emptyList()
-            } else {
-                throw IOException()
+            val results = starwarsApi.searchStarwarsApi(searchQuery, position)
+                .results?.filterNotNull() ?: emptyList()
+            val characters = results.map {
+                CharacterMapper().mapToDomain(it)
             }
 
-            val nextKey = if (results.isEmpty()) null else position + 1
+            val nextKey = if (characters.isEmpty()) null else position + 1
+
             LoadResult.Page(
-                data = results,
+                data = characters,
                 prevKey = if (position == FIRST_PAGE_INDEX) null else position - 1,
                 nextKey = nextKey
             )
@@ -46,13 +38,11 @@ class CharactersPagingSource @Inject constructor(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Result>): Int? {
-        return state.anchorPosition
-
-//        return state.anchorPosition?.let { anchorPosition ->
-//            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
-//                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
-//        }
+    override fun getRefreshKey(state: PagingState<Int, Character>): Int? {
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
     }
 
 }

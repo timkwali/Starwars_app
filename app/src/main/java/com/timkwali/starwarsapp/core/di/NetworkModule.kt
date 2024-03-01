@@ -2,6 +2,8 @@ package com.timkwali.starwarsapp.core.di
 
 import com.timkwali.starwarsapp.core.data.remote.StarwarsApi
 import com.timkwali.starwarsapp.core.utils.Constants.BASE_URL
+import com.timkwali.starwarsapp.core.utils.ErrorTypeToErrorTextConverter
+import com.timkwali.starwarsapp.core.utils.ErrorTypeToErrorTextConverterImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,5 +62,11 @@ object NetworkModule {
     @Singleton
     fun provideStarwarsApi(retrofit: Retrofit): StarwarsApi {
         return retrofit.create(StarwarsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideErrorTypeConverter(): ErrorTypeToErrorTextConverter {
+        return ErrorTypeToErrorTextConverterImpl()
     }
 }
