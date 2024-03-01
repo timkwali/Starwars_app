@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.timkwali.starwarsapp.R
 import com.timkwali.starwarsapp.core.presentation.components.SimpleSnackbar
@@ -55,7 +56,7 @@ import com.timkwali.starwarsapp.details.domain.model.film.Film
 import com.timkwali.starwarsapp.details.domain.model.homeworld.HomeWorld
 import com.timkwali.starwarsapp.details.domain.model.species.Species
 import com.timkwali.starwarsapp.details.presentation.DetailComponent
-import com.timkwali.starwarsapp.details.presentation.components.AppDialogExample
+import com.timkwali.starwarsapp.details.presentation.components.AppDialog
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,10 +128,6 @@ fun DetailsScreen(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
                 ) {
-//                if(searchState is UiState.Loading) {
-//                    CircularProgressIndicator(color = Orange)
-//                }
-
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Row(
@@ -148,7 +145,7 @@ fun DetailsScreen(
                         Box(modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.TopCenter
                         ) {
-                            Text(text = "Character Details", style = typography.titleLarge, color = White)
+                            Text(text = stringResource(id = R.string.character_details), style = typography.titleLarge, color = White)
                         }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
@@ -167,9 +164,9 @@ fun DetailsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                DetailComponent(title = "Name", value = characterDetails?.name ?: "Unknown")
-                                DetailComponent(title = "Height", value = characterDetails?.height ?: "Unknown")
-                                DetailComponent(title = "Birth Year", value = characterDetails?.birthYear ?: "Unknown")
+                                DetailComponent(title = stringResource(id = R.string.name), value = characterDetails?.name ?: stringResource(id = R.string.unknown))
+                                DetailComponent(title = stringResource(id = R.string.height), value = characterDetails?.height ?: stringResource(id = R.string.unknown))
+                                DetailComponent(title = stringResource(id = R.string.birth_year), value = characterDetails?.birthYear ?: stringResource(id = R.string.unknown))
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             Divider(modifier = Modifier
@@ -181,8 +178,8 @@ fun DetailsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                DetailComponent(title = "Home World", value = homeWorldState?.name ?: "Unknown")
-                                DetailComponent(title = "Population", value = homeWorldState?.population ?: "Unknown")
+                                DetailComponent(title = stringResource(id = R.string.home_world), value = homeWorldState?.name ?: stringResource(id = R.string.unknown))
+                                DetailComponent(title = stringResource(id = R.string.population), value = homeWorldState?.population ?: stringResource(id = R.string.unknown))
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                         }
@@ -200,6 +197,11 @@ fun DetailsScreen(
                     ) {
                         Text(text = "Species", style = typography.titleMedium, color = Orange, modifier = Modifier.padding(start = 20.dp))
                         Spacer(modifier = Modifier.height(10.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            if(isSpeciesLoading) {
+                                CircularProgressIndicator(color = Orange, modifier = Modifier.size(30.dp))
+                            }
+                        }
                         LazyRow(
                             modifier = Modifier,
                             contentPadding = PaddingValues(horizontal = 18.dp)
@@ -240,8 +242,13 @@ fun DetailsScreen(
                                 shape = RoundedCornerShape(10.dp)
                             )
                     ) {
-                        Text(text = "Films", style = typography.titleMedium, color = Orange, modifier = Modifier.padding(start = 20.dp))
+                        Text(text = stringResource(id = R.string.films), style = typography.titleMedium, color = Orange, modifier = Modifier.padding(start = 20.dp))
                         Spacer(modifier = Modifier.height(10.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            if(isFilmsLoading) {
+                                CircularProgressIndicator(color = Orange, modifier = Modifier.size(30.dp).fillMaxWidth())
+                            }
+                        }
                         LazyRow(
                             modifier = Modifier,
                             contentPadding = PaddingValues(horizontal = 20.dp)
@@ -270,7 +277,7 @@ fun DetailsScreen(
                                     Spacer(modifier = Modifier.height(5.dp))
                                     Text(text = it.openingCrawl, style = typography.bodyMedium, color = Grey, modifier = Modifier.weight(1f))
                                     Spacer(modifier = Modifier.height(5.dp))
-                                    Text(text = "more...", style = typography.bodyLarge, color = Orange)
+                                    Text(text = stringResource(id = R.string.more), style = typography.bodyLarge, color = Orange)
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
@@ -286,7 +293,7 @@ fun DetailsScreen(
                 CircularProgressIndicator(color = Orange)
             }
             if(openAlertDialog.value) {
-                AppDialogExample(
+                AppDialog(
                     onDismissRequest = { openAlertDialog.value = false  },
                     onConfirmation = { openAlertDialog.value = false },
                     dialogTitle = alertDialogFilm.value?.title ?: "",

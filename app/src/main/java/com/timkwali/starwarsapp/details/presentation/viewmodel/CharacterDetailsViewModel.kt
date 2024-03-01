@@ -66,7 +66,6 @@ class CharacterDetailsViewModel @Inject constructor(
     private suspend fun getCharacterDetails(characterId: String) {
         try {
             _characterDetails.value = UiState.Loading()
-            delay(1000)
             when(val resource = getCharacterDetails.invoke(characterId)) {
                 is Resource.Success -> {
                     resource.data.collect {

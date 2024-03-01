@@ -42,7 +42,6 @@ class SearchViewModel @Inject constructor(
     private suspend fun searchCharacters(searchQuery: String) {
         try {
             _characterState.value = UiState.Loading()
-            delay(1000)
             _characterState.value = when(val resource = searchStarwarsApi.invoke(searchQuery)) {
                 is Resource.Success -> UiState.Loaded(resource.data)
                 is Resource.Error -> UiState.Error(errorTypeToErrorTextConverter

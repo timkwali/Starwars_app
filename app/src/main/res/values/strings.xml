@@ -5,4 +5,14 @@
     <string name="error_server">Server error</string>
     <string name="error_network_unavailable">Network unavailable</string>
     <string name="error_general">Error fetching data</string>
+    <string name="search_characters">Search Characters</string>
+    <string name="name">Name</string>
+    <string name="unknown">Unknown</string>
+    <string name="height">Height</string>
+    <string name="birth_year">Birth Year</string>
+    <string name="character_details">Character Details</string>
+    <string name="home_world">Home world</string>
+    <string name="population">Population</string>
+    <string name="films">Films</string>
+    <string name="more">more…</string>
 </resources>

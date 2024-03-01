@@ -14,7 +14,7 @@ import com.timkwali.starwarsapp.core.presentation.theme.Orange
 
 
 @Composable
-fun AppDialogExample(
+fun AppDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     dialogTitle: String,
@@ -22,7 +22,7 @@ fun AppDialogExample(
     icon: ImageVector,
 ) {
     AlertDialog(
-        icon = { Icon(icon, contentDescription = "Example Icon") },
+        icon = { Icon(icon, contentDescription = "Example Icon", tint = Orange) },
         title = { Text(text = dialogTitle, style = typography.titleMedium) },
         text = { Text(text = dialogText, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
         onDismissRequest = {
