@@ -1,4 +1,4 @@
-package com.timkwali.starwarsapp.core.data.api.model
+package com.timkwali.starwarsapp.core.data.remote.model.response.search
 
 
 import com.google.gson.annotations.SerializedName

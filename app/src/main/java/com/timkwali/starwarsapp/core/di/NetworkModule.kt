@@ -1,6 +1,6 @@
 package com.timkwali.starwarsapp.core.di
 
-import com.timkwali.starwarsapp.core.data.api.StarwarsApi
+import com.timkwali.starwarsapp.core.data.remote.StarwarsApi
 import com.timkwali.starwarsapp.core.utils.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -20,12 +20,6 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideLogger(): HttpLoggingInterceptor {
-//        return if (BuildConfig.DEBUG)
-//            HttpLoggingInterceptor()
-//                .setLevel(HttpLoggingInterceptor.Level.BODY)
-//        else HttpLoggingInterceptor()
-//            .setLevel(HttpLoggingInterceptor.Level.NONE)
-
         return HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BODY)
     }

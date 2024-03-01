@@ -1,6 +1,8 @@
-package com.timkwali.starwarsapp.search.di
+package com.timkwali.starwarsapp.details.di
 
 import com.timkwali.starwarsapp.core.data.remote.StarwarsApi
+import com.timkwali.starwarsapp.details.data.repository.CharacterDetailsRepositoryImpl
+import com.timkwali.starwarsapp.details.domain.repository.CharacterDetailsRepository
 import com.timkwali.starwarsapp.search.data.repository.SearchRepositoryImpl
 import com.timkwali.starwarsapp.search.domain.repository.SearchRepository
 import dagger.Module
@@ -11,11 +13,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object SearchModule {
+object DetailsModule {
 
     @Provides
     @Singleton
-    fun provideSearchRepository(starwarsApi: StarwarsApi): SearchRepository {
-        return SearchRepositoryImpl(starwarsApi)
+    fun provideCharacterDetailsRepository(starwarsApi: StarwarsApi): CharacterDetailsRepository {
+        return CharacterDetailsRepositoryImpl(starwarsApi)
     }
 }
