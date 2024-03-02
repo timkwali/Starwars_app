@@ -21,6 +21,7 @@ import com.timkwali.starwarsapp.details.domain.usecase.GetSpecies
 import com.timkwali.starwarsapp.details.presentation.events.CharacterDetailsEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.cache
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -1,18 +1,16 @@
 package com.timkwali.starwarsapp.search.presentation.viewmodel
 
-import android.net.ConnectivityManager
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.timkwali.starwarsapp.core.utils.ErrorType
 import com.timkwali.starwarsapp.core.utils.ErrorTypeToErrorTextConverter
 import com.timkwali.starwarsapp.core.utils.Resource
 import com.timkwali.starwarsapp.core.utils.UiState
-import com.timkwali.starwarsapp.core.utils.isInternetAvailable
 import com.timkwali.starwarsapp.search.domain.model.character.Character
 import com.timkwali.starwarsapp.search.domain.usecase.SearchStarwarsApi
 import com.timkwali.starwarsapp.search.presentation.events.SearchEvent
@@ -46,7 +44,7 @@ class SearchViewModel @Inject constructor(
         _characterState.value = UiState.Loading()
         delay(300)
         _characterState.value = when(val resource = searchStarwarsApi.invoke(searchQuery)) {
-            is Resource.Success -> UiState.Loaded(resource.data)
+            is Resource.Success -> UiState.Loaded(resource.data.cachedIn(viewModelScope))
             is Resource.Error -> UiState.Error(errorTypeToErrorTextConverter.convert(resource.error))
         }
     }

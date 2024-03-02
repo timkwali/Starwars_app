@@ -4,6 +4,7 @@ import android.net.ConnectivityManager
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.PagingSource
 import com.timkwali.starwarsapp.core.utils.Constants.PER_PAGE
 import com.timkwali.starwarsapp.core.utils.Resource
 import com.timkwali.starwarsapp.core.utils.isInternetAvailable
@@ -19,7 +20,21 @@ class SearchStarwarsApi @Inject constructor(
     private val searchRepository: SearchRepository,
     private val connectivityManager: ConnectivityManager
 ) {
-    operator fun invoke(searchQuery: String): Resource<Flow<PagingData<Character>>> {
+    suspend operator fun invoke(searchQuery: String): Resource<Flow<PagingData<Character>>> {
+//        val refreshLoadParams = PagingSource.LoadParams.Refresh<Int>(
+//            key = null,
+//            loadSize = 10,
+//            placeholdersEnabled = false
+//        )
+//        val ps = CharactersPagingSource(
+//            searchQuery = searchQuery,
+//            searchRepository = searchRepository
+//        )
+//
+//        ps.load(refreshLoadParams) is PagingSource.LoadResult.Error
+
+
+
         return try {
             if(!isInternetAvailable(connectivityManager)) {
                 throw IOException()

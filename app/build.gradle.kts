@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
@@ -82,6 +83,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit-mock:2.9.0")
     implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.49")
@@ -97,6 +99,12 @@ dependencies {
 
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation("androidx.paging:paging-compose:3.2.1")
+
+    //Mockito
+    testImplementation("org.mockito:mockito-core:4.0.0")
+    androidTestImplementation("org.mockito:mockito-android:4.0.0")
+    testImplementation("android.arch.core:core-testing:1.1.1")
+    testImplementation("org.mockito:mockito-inline:3.11.2")
 }
 
 kapt {

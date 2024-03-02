@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.paging.PagingData
+import androidx.paging.PagingSource
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.timkwali.starwarsapp.core.utils.ErrorType
 import com.timkwali.starwarsapp.core.utils.UiState
