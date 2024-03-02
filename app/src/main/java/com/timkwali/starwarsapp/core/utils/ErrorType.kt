@@ -12,6 +12,8 @@ sealed class ErrorType {
 
         object Server : Api()
 
+        object EmptyListError: Api()
+
     }
 
     object Unknown: ErrorType()

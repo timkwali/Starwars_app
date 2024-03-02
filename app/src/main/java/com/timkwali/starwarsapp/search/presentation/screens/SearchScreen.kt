@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.timkwali.starwarsapp.R
@@ -65,10 +67,8 @@ fun SearchScreen(
 ) {
     var showError by rememberSaveable { mutableStateOf(false) }
     val controller = LocalSoftwareKeyboardController.current
-    var showLoading by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = searchState) {
-        showLoading = searchState is UiState.Loading
+    LaunchedEffect(key1 = searchState is UiState.Error) {
         if(searchState is UiState.Error) {
             showError = true
             delay(3000)
@@ -154,6 +154,9 @@ fun SearchScreen(
                                 }
                             }
                         }
+                        if(lazyPagingItems.loadState.append == LoadState.Loading) {
+                            CircularProgressIndicator(color = Orange, modifier = Modifier.size(20.dp))
+                        }
                     }
                 }
 
@@ -165,7 +168,7 @@ fun SearchScreen(
                 }
             }
 
-            if(showLoading) {
+            if(searchState is UiState.Loading) {
                 CircularProgressIndicator(color = Orange)
             }
         }

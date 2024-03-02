@@ -19,25 +19,25 @@ interface StarwarsApi {
     suspend fun searchStarwarsApi(
         @Query(SEARCH_QUERY) searchQuery: String,
         @Query(PAGE_QUERY) page: Int
-    ): SearchResponse
+    ): Response<SearchResponse>
 
     @GET("$CHARACTER_ENDPOINT/{id}")
     suspend fun getCharacterDetail(
         @Path("id") id: String
-    ): CharacterDetailsResponse
+    ): Response<CharacterDetailsResponse>
 
     @GET("{species}")
     suspend fun getSpecies(
         @Path("species") species: String
-    ): SpeciesResponse
+    ): Response<SpeciesResponse>
 
     @GET("{homeworld}")
     suspend fun getHomeWorld(
         @Path("homeworld") homeWorld: String
-    ): HomeWorldResponse
+    ): Response<HomeWorldResponse>
 
     @GET("{film}")
     suspend fun getFilm(
         @Path("film") film: String
-    ): FilmResponse
+    ): Response<FilmResponse>
 }

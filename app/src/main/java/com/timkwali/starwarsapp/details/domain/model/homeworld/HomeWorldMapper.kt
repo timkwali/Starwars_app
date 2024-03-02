@@ -4,10 +4,10 @@ import com.timkwali.starwarsapp.core.data.remote.model.response.homeworld.HomeWo
 import com.timkwali.starwarsapp.core.utils.DomainMapper
 
 class HomeWorldMapper: DomainMapper<HomeWorldResponse, HomeWorld> {
-    override suspend fun mapToDomain(entity: HomeWorldResponse): HomeWorld {
+    override suspend fun mapToDomain(entity: HomeWorldResponse?): HomeWorld {
         return HomeWorld(
-            name = entity.name ?: "Unknown",
-            population = entity.population ?: "Unknown"
+            name = entity?.name ?: "Unknown",
+            population = entity?.population ?: "Unknown"
         )
     }
 }

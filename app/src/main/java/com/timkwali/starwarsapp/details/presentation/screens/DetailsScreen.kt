@@ -51,6 +51,7 @@ import com.timkwali.starwarsapp.core.presentation.components.SimpleSnackbar
 import com.timkwali.starwarsapp.core.presentation.theme.Grey
 import com.timkwali.starwarsapp.core.presentation.theme.Orange
 import com.timkwali.starwarsapp.core.presentation.theme.White
+import com.timkwali.starwarsapp.core.utils.UiState
 import com.timkwali.starwarsapp.details.domain.model.details.CharacterDetails
 import com.timkwali.starwarsapp.details.domain.model.film.Film
 import com.timkwali.starwarsapp.details.domain.model.homeworld.HomeWorld
@@ -63,17 +64,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun DetailsScreen(
     characterId: String,
-    characterDetails: CharacterDetails?,
-    speciesState: List<Species>?,
-    filmsState: List<Film>?,
-    homeWorldState: HomeWorld?,
-
-    isCharacterLoading: Boolean,
-    isSpeciesLoading: Boolean,
-    isFilmsLoading: Boolean,
+    characterDetailsState: UiState<CharacterDetails?>,
+    speciesState: UiState<List<Species>>,
+    filmsState: UiState<List<Film>>,
+    homeWorldState: UiState<HomeWorld?>,
     isErrorState: Boolean,
-    errorMessage: String?,
-
+    errorMessage: String,
     getCharacterDetails: (characterId: String) -> Unit,
     getSpecies: (speciesUrl: List<String>) -> Unit,
     getHomeWorld: (homeWorldUrl: String) -> Unit,
@@ -81,7 +77,7 @@ fun DetailsScreen(
     navigateBack: () -> Unit
 ) {
     var showError by rememberSaveable { mutableStateOf(false) }
-    val openAlertDialog = rememberSaveable{ mutableStateOf(false) }
+    val showAlertDialog = rememberSaveable{ mutableStateOf(false) }
     val alertDialogFilm: MutableState<Film?> = rememberSaveable { mutableStateOf(null) }
 
     Scaffold(
@@ -91,16 +87,18 @@ fun DetailsScreen(
             getCharacterDetails(characterId)
         }
         LaunchedEffect(key1 = isErrorState) {
-            showError = isErrorState == true
-            if(showError) {
+            if(isErrorState) {
+                showError = true
                 delay(3000)
                 showError = false
             }
         }
-        LaunchedEffect(key1 = characterDetails) {
-            getSpecies(characterDetails?.speciesUrl ?: emptyList())
-            getHomeWorld(characterDetails?.homeWorldUrl ?: "")
-            getFilms(characterDetails?.filmsUrl ?: emptyList())
+        LaunchedEffect(key1 = characterDetailsState) {
+            if(characterDetailsState is UiState.Loaded && characterDetailsState.data != null) {
+                getSpecies(characterDetailsState.data?.speciesUrl ?: emptyList())
+                getHomeWorld(characterDetailsState.data?.homeWorldUrl ?: "")
+                getFilms(characterDetailsState.data?.filmsUrl ?: emptyList())
+            }
         }
 
 
@@ -164,9 +162,11 @@ fun DetailsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                DetailComponent(title = stringResource(id = R.string.name), value = characterDetails?.name ?: stringResource(id = R.string.unknown))
-                                DetailComponent(title = stringResource(id = R.string.height), value = characterDetails?.height ?: stringResource(id = R.string.unknown))
-                                DetailComponent(title = stringResource(id = R.string.birth_year), value = characterDetails?.birthYear ?: stringResource(id = R.string.unknown))
+                                if(characterDetailsState is UiState.Loaded) {
+                                    DetailComponent(title = stringResource(id = R.string.name), value = characterDetailsState.data?.name ?: stringResource(id = R.string.unknown))
+                                    DetailComponent(title = stringResource(id = R.string.height), value = characterDetailsState.data?.height ?: stringResource(id = R.string.unknown))
+                                    DetailComponent(title = stringResource(id = R.string.birth_year), value = characterDetailsState.data?.birthYear ?: stringResource(id = R.string.unknown))
+                                }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             Divider(modifier = Modifier
@@ -178,8 +178,10 @@ fun DetailsScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                DetailComponent(title = stringResource(id = R.string.home_world), value = homeWorldState?.name ?: stringResource(id = R.string.unknown))
-                                DetailComponent(title = stringResource(id = R.string.population), value = homeWorldState?.population ?: stringResource(id = R.string.unknown))
+                                if(homeWorldState is UiState.Loaded) {
+                                    DetailComponent(title = stringResource(id = R.string.home_world), value = homeWorldState.data?.name ?: stringResource(id = R.string.unknown))
+                                    DetailComponent(title = stringResource(id = R.string.population), value = homeWorldState.data?.population ?: stringResource(id = R.string.unknown))
+                                }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                         }
@@ -198,36 +200,38 @@ fun DetailsScreen(
                         Text(text = "Species", style = typography.titleMedium, color = Orange, modifier = Modifier.padding(start = 20.dp))
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            if(isSpeciesLoading) {
+                            if(speciesState is UiState.Loading) {
                                 CircularProgressIndicator(color = Orange, modifier = Modifier.size(30.dp))
                             }
                         }
-                        LazyRow(
-                            modifier = Modifier,
-                            contentPadding = PaddingValues(horizontal = 18.dp)
-                        ) {
-                            items(items = speciesState ?: emptyList()) {
-                                Row(
-                                    Modifier
-                                        .width(250.dp)
-                                        .height(150.dp)
-                                        .padding(all = 5.dp)
-                                        .background(
-                                            Grey.copy(0.5f),
-                                            shape = RoundedCornerShape(10.dp)
-                                        )
-                                        .clip(RoundedCornerShape(10.dp)),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
-                                    DetailComponent(title = "Name", value = it.name)
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Divider(
+                        if(speciesState is UiState.Loaded) {
+                            LazyRow(
+                                modifier = Modifier,
+                                contentPadding = PaddingValues(horizontal = 18.dp)
+                            ) {
+                                items(items = speciesState.data) {
+                                    Row(
                                         Modifier
-                                            .height(50.dp)
-                                            .width(1.dp), color = Grey)
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    DetailComponent(title = "Language", value = it.language)
+                                            .width(250.dp)
+                                            .height(150.dp)
+                                            .padding(all = 5.dp)
+                                            .background(
+                                                Grey.copy(0.5f),
+                                                shape = RoundedCornerShape(10.dp)
+                                            )
+                                            .clip(RoundedCornerShape(10.dp)),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        DetailComponent(title = "Name", value = it.name)
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        Divider(
+                                            Modifier
+                                                .height(50.dp)
+                                                .width(1.dp), color = Grey)
+                                        Spacer(modifier = Modifier.width(5.dp))
+                                        DetailComponent(title = "Language", value = it.language)
+                                    }
                                 }
                             }
                         }
@@ -245,62 +249,63 @@ fun DetailsScreen(
                         Text(text = stringResource(id = R.string.films), style = typography.titleMedium, color = Orange, modifier = Modifier.padding(start = 20.dp))
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            if(isFilmsLoading) {
+                            if(filmsState is UiState.Loading) {
                                 CircularProgressIndicator(color = Orange, modifier = Modifier.size(30.dp).fillMaxWidth())
                             }
                         }
-                        LazyRow(
-                            modifier = Modifier,
-                            contentPadding = PaddingValues(horizontal = 20.dp)
-                        ) {
-                            items(items = filmsState ?: emptyList()) {
-                                Column(
-                                    Modifier
-                                        .width(200.dp)
-                                        .height(300.dp)
-                                        .border(
-                                            color = Color.Transparent,
-                                            width = 0.dp,
-                                            shape = RoundedCornerShape(10.dp)
-                                        )
-                                        .background(
-                                            Grey.copy(0.5f),
-                                            shape = RoundedCornerShape(10.dp)
-                                        )
-                                        .padding(all = 8.dp)
-                                        .clickable {
-                                            openAlertDialog.value = true
-                                            alertDialogFilm.value = it
-                                        },
-                                ) {
-                                    Text(text = it.title, style = typography.titleMedium, color = White, maxLines = 2)
-                                    Spacer(modifier = Modifier.height(5.dp))
-                                    Text(text = it.openingCrawl, style = typography.bodyMedium, color = Grey, modifier = Modifier.weight(1f))
-                                    Spacer(modifier = Modifier.height(5.dp))
-                                    Text(text = stringResource(id = R.string.more), style = typography.bodyLarge, color = Orange)
+                        if(filmsState is UiState.Loaded) {
+                            LazyRow(
+                                modifier = Modifier,
+                                contentPadding = PaddingValues(horizontal = 20.dp)
+                            ) {
+                                items(items = filmsState.data) {
+                                    Column(
+                                        Modifier
+                                            .width(200.dp)
+                                            .height(300.dp)
+                                            .border(
+                                                color = Color.Transparent,
+                                                width = 0.dp,
+                                                shape = RoundedCornerShape(10.dp)
+                                            )
+                                            .background(
+                                                Grey.copy(0.5f),
+                                                shape = RoundedCornerShape(10.dp)
+                                            )
+                                            .padding(all = 8.dp)
+                                            .clickable {
+                                                showAlertDialog.value = true
+                                                alertDialogFilm.value = it
+                                            },
+                                    ) {
+                                        Text(text = it.title, style = typography.titleMedium, color = White, maxLines = 2)
+                                        Spacer(modifier = Modifier.height(5.dp))
+                                        Text(text = it.openingCrawl, style = typography.bodyMedium, color = Grey, modifier = Modifier.weight(1f))
+                                        Spacer(modifier = Modifier.height(5.dp))
+                                        Text(text = stringResource(id = R.string.more), style = typography.bodyLarge, color = Orange)
+                                    }
+                                    Spacer(modifier = Modifier.width(10.dp))
                                 }
-                                Spacer(modifier = Modifier.width(10.dp))
                             }
                         }
                     }
                 }
                 SimpleSnackbar(
-                    message = errorMessage ?: "",
+                    message = errorMessage,
                     isVisible = showError
                 )
             }
-            if(isCharacterLoading) {
+            if(characterDetailsState is UiState.Loading) {
                 CircularProgressIndicator(color = Orange)
             }
-            if(openAlertDialog.value) {
-                AppDialog(
-                    onDismissRequest = { openAlertDialog.value = false  },
-                    onConfirmation = { openAlertDialog.value = false },
-                    dialogTitle = alertDialogFilm.value?.title ?: "",
-                    dialogText = alertDialogFilm.value?.openingCrawl ?: "",
-                    icon = Icons.Filled.Info
-                )
-            }
+            AppDialog(
+                onDismissRequest = { showAlertDialog.value = false  },
+                onConfirmation = { showAlertDialog.value = false },
+                dialogTitle = alertDialogFilm.value?.title ?: "",
+                dialogText = alertDialogFilm.value?.openingCrawl ?: "",
+                icon = Icons.Filled.Info,
+                isVisible = showAlertDialog.value
+            )
         }
     }
 }

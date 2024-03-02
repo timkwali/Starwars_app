@@ -1,5 +1,8 @@
 package com.timkwali.starwarsapp.core.di
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
 import com.timkwali.starwarsapp.core.data.remote.StarwarsApi
 import com.timkwali.starwarsapp.core.utils.Constants.BASE_URL
 import com.timkwali.starwarsapp.core.utils.ErrorTypeToErrorTextConverter
@@ -68,5 +71,11 @@ object NetworkModule {
     @Singleton
     fun provideErrorTypeConverter(): ErrorTypeToErrorTextConverter {
         return ErrorTypeToErrorTextConverterImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideConnectivityManager(application: Application): ConnectivityManager {
+        return application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 }

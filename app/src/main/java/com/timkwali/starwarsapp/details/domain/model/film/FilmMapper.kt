@@ -4,10 +4,10 @@ import com.timkwali.starwarsapp.core.data.remote.model.response.film.FilmRespons
 import com.timkwali.starwarsapp.core.utils.DomainMapper
 
 class FilmMapper: DomainMapper<FilmResponse, Film> {
-    override suspend fun mapToDomain(entity: FilmResponse): Film {
+    override suspend fun mapToDomain(entity: FilmResponse?): Film {
         return Film(
-            title = entity.title ?: "Unknown",
-            openingCrawl = entity.openingCrawl ?: ""
+            title = entity?.title ?: "Unknown",
+            openingCrawl = entity?.openingCrawl ?: ""
         )
     }
 }

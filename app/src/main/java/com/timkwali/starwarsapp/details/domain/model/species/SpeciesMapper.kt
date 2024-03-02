@@ -4,10 +4,10 @@ import com.timkwali.starwarsapp.core.data.remote.model.response.species.SpeciesR
 import com.timkwali.starwarsapp.core.utils.DomainMapper
 
 class SpeciesMapper: DomainMapper<SpeciesResponse, Species> {
-    override suspend fun mapToDomain(entity: SpeciesResponse): Species {
+    override suspend fun mapToDomain(entity: SpeciesResponse?): Species {
         return Species(
-            name = entity.name ?: "",
-            language = entity.language ?: "",
+            name = entity?.name ?: "",
+            language = entity?.language ?: "",
         )
     }
 }

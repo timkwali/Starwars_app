@@ -1,6 +1,5 @@
 package com.timkwali.starwarsapp.details.presentation.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -22,11 +21,8 @@ import com.timkwali.starwarsapp.details.domain.usecase.GetSpecies
 import com.timkwali.starwarsapp.details.presentation.events.CharacterDetailsEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,12 +37,12 @@ class CharacterDetailsViewModel @Inject constructor(
     private var _characterDetails: MutableState<UiState<CharacterDetails?>> = mutableStateOf(UiState.Loaded(null))
     val characterDetails: State<UiState<CharacterDetails?>> get() = _characterDetails
 
-    private var _speciesState : MutableState<UiState<List<Species>?>> = mutableStateOf(UiState.Loaded(null))
-    val speciesState: State<UiState<List<Species>?>> get() = _speciesState
+    private var _speciesState : MutableState<UiState<List<Species>>> = mutableStateOf(UiState.Loaded(emptyList()))
+    val speciesState: State<UiState<List<Species>>> get() = _speciesState
     private val speciesList: MutableList<Species> = mutableListOf()
 
-    private var _filmsState : MutableState<UiState<List<Film>?>> = mutableStateOf(UiState.Loaded(null))
-    val filmsState: State<UiState<List<Film>?>> get() = _filmsState
+    private var _filmsState : MutableState<UiState<List<Film>>> = mutableStateOf(UiState.Loaded(emptyList()))
+    val filmsState: State<UiState<List<Film>>> get() = _filmsState
     private val filmList: MutableList<Film> = mutableListOf()
 
     private var _homeWorldState : MutableState<UiState<HomeWorld?>> = mutableStateOf(UiState.Loaded(null))
@@ -64,101 +60,59 @@ class CharacterDetailsViewModel @Inject constructor(
     }
 
     private suspend fun getCharacterDetails(characterId: String) {
-        try {
-            _characterDetails.value = UiState.Loading()
-            when(val resource = getCharacterDetails.invoke(characterId)) {
-                is Resource.Success -> {
-                    resource.data.collect {
-                        _characterDetails.value = UiState.Loaded(it)
-                    }}
-                is Resource.Error -> {
-                    _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                        .convert(ErrorType.Api.ServiceUnavailable))
-                }
-                else -> _characterDetails.value = UiState.Loading()
+        _characterDetails.value = UiState.Loading()
+        getCharacterDetails.invoke(characterId).collectLatest {
+            when(it) {
+                is Resource.Success -> _characterDetails.value = UiState.Loaded(it.data)
+                is Resource.Error -> _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter.convert(it.error))
             }
-        } catch (e: IOException) {
-            _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                .convert(ErrorType.Api.Network))
-        }catch (e: Exception) {
-            _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                .convert(ErrorType.Unknown))
         }
     }
 
     private suspend fun getSpecies(species: List<String>) {
-        species.forEach {
-            try {
-                if(it.isNotEmpty()) {
-                    _speciesState.value = UiState.Loading()
-                        val endpoint = it.substring(BASE_URL.length)
-                        when(val resource = getSpecies.invoke(endpoint)) {
-                            is Resource.Success -> resource.data.collect {
-                                speciesList.add(it)
-                                _speciesState.value = UiState.Loaded(speciesList)
-                            }
-                            is Resource.Error -> _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                                    .convert(ErrorType.Api.ServiceUnavailable))
-                            else -> _characterDetails.value = UiState.Loading()
+        species.forEach { specie ->
+            if(specie.isNotEmpty()) {
+                _speciesState.value = UiState.Loading()
+                val endpoint = specie.substring(BASE_URL.length)
+                getSpecies.invoke(endpoint).collectLatest { resource ->
+                    when(resource) {
+                        is Resource.Success -> {
+                            speciesList.add(resource.data)
+                            _speciesState.value = UiState.Loaded(speciesList)
                         }
+                        is Resource.Error -> _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter.convert(resource.error))
+                    }
                 }
-            } catch (e: IOException) {
-                _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                    .convert(ErrorType.Api.Network))
-            }catch (e: Exception) {
-                _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                    .convert(ErrorType.Unknown))
             }
         }
     }
 
     private suspend fun getHomeWorld(homeWorldUrl: String) {
-        try {
-            if(homeWorldUrl.isNotEmpty()) {
-                val endpoint = homeWorldUrl.substring(BASE_URL.length)
-                when(val resource = getHomeWorld.invoke(endpoint)) {
-                    is Resource.Success -> resource.data.collect {
-                        _homeWorldState.value = UiState.Loaded(it)
-                    }
-                    is Resource.Error -> _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                        .convert(ErrorType.Api.ServiceUnavailable))
-                    else -> _characterDetails.value = UiState.Loading()
+        if(homeWorldUrl.isNotEmpty()) {
+            val endpoint = homeWorldUrl.substring(BASE_URL.length)
+            getHomeWorld.invoke(endpoint).collectLatest { resource ->
+                when(resource) {
+                    is Resource.Success -> _homeWorldState.value = UiState.Loaded(resource.data)
+                    is Resource.Error -> _homeWorldState.value = UiState.Error(errorTypeToErrorTextConverter.convert(resource.error))
                 }
             }
-        } catch (e: IOException) {
-            _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                .convert(ErrorType.Api.Network))
-        }catch (e: Exception) {
-            _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                .convert(ErrorType.Unknown))
         }
-
     }
 
     private suspend fun getFilms(filmsUrl: List<String>) {
-        filmsUrl.forEach {
-            try {
-                if(it.isNotEmpty()) {
-                    _filmsState.value = UiState.Loading()
-                    val endpoint = it.substring(BASE_URL.length)
-                    when(val resource = getFilm.invoke(endpoint)) {
-                        is Resource.Success -> resource.data.collect {
-                            filmList.add(it)
+        filmsUrl.forEach { filmUrl ->
+            if(filmUrl.isNotEmpty()) {
+                _filmsState.value = UiState.Loading()
+                val endpoint = filmUrl.substring(BASE_URL.length)
+                getFilm.invoke(endpoint).collectLatest { resource ->
+                    when(resource) {
+                        is Resource.Success -> {
+                            filmList.add(resource.data)
                             _filmsState.value = UiState.Loaded(filmList)
                         }
-                        is Resource.Error -> {
-                            _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                                .convert(ErrorType.Api.ServiceUnavailable))
-                        }
-                        else -> _characterDetails.value = UiState.Loading()
+                        is Resource.Error -> _filmsState.value = UiState.Error(errorTypeToErrorTextConverter.convert(resource.error))
                     }
                 }
-            } catch (e: IOException) {
-                _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                    .convert(ErrorType.Api.Network))
-            }catch (e: Exception) {
-                _characterDetails.value = UiState.Error(errorTypeToErrorTextConverter
-                    .convert(ErrorType.Unknown))
             }
         }
     }
