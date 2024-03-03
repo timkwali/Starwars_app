@@ -8,6 +8,7 @@ import com.timkwali.starwarsapp.core.data.remote.model.response.search.Result
 import com.timkwali.starwarsapp.core.utils.Constants.FIRST_PAGE_INDEX
 import com.timkwali.starwarsapp.core.utils.EmptyResponseException
 import com.timkwali.starwarsapp.core.utils.Resource
+import com.timkwali.starwarsapp.core.utils.toException
 import com.timkwali.starwarsapp.search.domain.model.character.Character
 import com.timkwali.starwarsapp.search.domain.model.character.CharacterMapper
 import com.timkwali.starwarsapp.search.domain.repository.SearchRepository
@@ -28,23 +29,22 @@ class CharactersPagingSource @Inject constructor(
         return try {
             val position = params.key ?: FIRST_PAGE_INDEX
             var characters: List<Character> = emptyList()
+            var nextKey: Int? = position
 
             withContext(Dispatchers.IO) {
                 this.async {
-                    searchRepository.searchStarwarsApi(searchQuery, position).collectLatest {
-                        if(it is Resource.Success) {
-                            characters = it.data?.results?.map {
+                    searchRepository.searchStarwarsApi(searchQuery, position).collectLatest { resource ->
+                        if(resource is Resource.Success) {
+                            nextKey = resource.data?.next?.last()?.digitToInt()
+                            characters = resource.data?.results?.map {
                                 CharacterMapper().mapToDomain(it)
                             } ?: emptyList()
-                        } else if(it is Resource.Error) {
-                            throw Exception()
+                        } else if(resource is Resource.Error) {
+                            throw resource.error.toException()
                         }
                     }
                 }.await()
             }
-
-
-            val nextKey = if (characters.isEmpty()) null else position + 1
 
             if(characters.isEmpty()) {
                 throw EmptyResponseException()
@@ -52,7 +52,7 @@ class CharactersPagingSource @Inject constructor(
                 LoadResult.Page(
                     data = characters,
                     prevKey = if (position == FIRST_PAGE_INDEX) null else position - 1,
-                    nextKey = nextKey
+                    nextKey = if (nextKey == null) null else position + 1
                 )
             }
 

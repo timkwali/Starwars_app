@@ -1,5 +1,7 @@
 package com.timkwali.starwarsapp.core.utils
 
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody
 import okio.IOException
 import retrofit2.HttpException
 import retrofit2.Response
@@ -23,4 +25,18 @@ fun Throwable.toErrorType() = when (this) {
         else -> ErrorType.Unknown
     }
     else -> ErrorType.Unknown
+}
+
+fun getHttpException(code: Int) = HttpException(Response.error<ResponseBody>(
+    code,
+    ResponseBody.create("plain/text".toMediaTypeOrNull(), "")
+))
+
+fun ErrorType.toException() = when(this) {
+    is ErrorType.Api.Network -> IOException()
+    is ErrorType.Api.EmptyListError -> EmptyResponseException()
+    is ErrorType.Api.NotFound -> getHttpException(404)
+    is ErrorType.Api.Server -> getHttpException(503)
+    is ErrorType.Api.ServiceUnavailable -> getHttpException(501)
+    else -> Exception()
 }

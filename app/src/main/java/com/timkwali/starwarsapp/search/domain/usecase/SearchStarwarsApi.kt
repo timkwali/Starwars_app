@@ -20,21 +20,7 @@ class SearchStarwarsApi @Inject constructor(
     private val searchRepository: SearchRepository,
     private val connectivityManager: ConnectivityManager
 ) {
-    suspend operator fun invoke(searchQuery: String): Resource<Flow<PagingData<Character>>> {
-//        val refreshLoadParams = PagingSource.LoadParams.Refresh<Int>(
-//            key = null,
-//            loadSize = 10,
-//            placeholdersEnabled = false
-//        )
-//        val ps = CharactersPagingSource(
-//            searchQuery = searchQuery,
-//            searchRepository = searchRepository
-//        )
-//
-//        ps.load(refreshLoadParams) is PagingSource.LoadResult.Error
-
-
-
+    operator fun invoke(searchQuery: String): Resource<Flow<PagingData<Character>>> {
         return try {
             if(!isInternetAvailable(connectivityManager)) {
                 throw IOException()
