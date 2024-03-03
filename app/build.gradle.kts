@@ -110,6 +110,7 @@ dependencies {
     testImplementation("android.arch.core:core-testing:1.1.1")
     testImplementation("org.mockito:mockito-inline:3.11.2")
 
+    //Turbine
     testImplementation("app.cash.turbine:turbine:1.0.0")
 }
 
