@@ -1,10 +1,20 @@
-package com.timkwali.starwarsapp.search.utils
+package com.timkwali.starwarsapp.core.utils
 
 import androidx.paging.PagingData
+import com.google.gson.annotations.SerializedName
+import com.timkwali.starwarsapp.core.data.remote.model.response.details.CharacterDetailsResponse
 import com.timkwali.starwarsapp.core.data.remote.model.response.search.Result
 import com.timkwali.starwarsapp.core.data.remote.model.response.search.SearchResponse
+import com.timkwali.starwarsapp.details.domain.model.details.CharacterDetails
+import com.timkwali.starwarsapp.details.domain.model.details.CharacterDetailsMapper
+import com.timkwali.starwarsapp.details.domain.model.film.Film
+import com.timkwali.starwarsapp.details.domain.model.species.Species
 import com.timkwali.starwarsapp.search.domain.model.character.Character
 import kotlinx.coroutines.flow.flowOf
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
 
 const val testSearchQuery = "luke"
 
@@ -26,11 +36,49 @@ val testResults = listOf(
 
 const val pageLoadSize = 4
 const val totalPage = 4
+const val startPage = 1
 
 val testSearchResponse = SearchResponse(
-    next = "1",
+    next = "$startPage",
     previous = null,
     results = testResults,
     count = testResults.size
 )
+
+fun getTestHttpException(code: Int) = HttpException(
+    Response.error<ResponseBody>(
+    code,
+    ResponseBody.create("plain/text".toMediaTypeOrNull(), "")
+))
+
+fun getTestResponseBody(): ResponseBody  {
+    return ResponseBody.create(
+        "plain/text".toMediaTypeOrNull(),
+        ""
+    )
+}
+
+val testCharacterDetailsResponse = CharacterDetailsResponse(
+    birthYear = "456",
+    created = "2/2/2024",
+    edited = "2/2/2024",
+    eyeColor = "pink",
+    films = listOf("film1"),
+    gender = "male",
+    hairColor = "black",
+    height = "566",
+    homeworld = "Munn",
+    mass = "3545",
+    name = "Oug",
+    skinColor = "red",
+    species = listOf("Munn"),
+    starships = listOf("ufo"),
+    url = "www.test.com/1/",
+    vehicles = listOf("vehicle")
+
+)
+
+suspend fun getTestCharacterDetails(): CharacterDetails {
+    return CharacterDetailsMapper().mapToDomain(testCharacterDetailsResponse)
+}
 

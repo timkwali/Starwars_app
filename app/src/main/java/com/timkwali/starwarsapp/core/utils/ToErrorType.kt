@@ -36,7 +36,7 @@ fun ErrorType.toException() = when(this) {
     is ErrorType.Api.Network -> IOException()
     is ErrorType.Api.EmptyListError -> EmptyResponseException()
     is ErrorType.Api.NotFound -> getHttpException(404)
-    is ErrorType.Api.Server -> getHttpException(503)
-    is ErrorType.Api.ServiceUnavailable -> getHttpException(501)
+    is ErrorType.Api.Server -> getHttpException(501)
+    is ErrorType.Api.ServiceUnavailable -> getHttpException(503)
     else -> Exception()
 }

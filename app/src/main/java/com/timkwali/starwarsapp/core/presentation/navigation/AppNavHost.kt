@@ -1,6 +1,7 @@
 package com.timkwali.starwarsapp.core.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,15 +34,10 @@ fun AppNavHost(
     ) {
         composable(route = Screen.Search.route) {
             val searchViewModel = hiltViewModel<SearchViewModel>()
-            val searchState = searchViewModel.characterState.value
             var searchValue by rememberSaveable{ mutableStateOf("") }
-//            if(searchState is UiState.Loaded &&
-//                (searchState.data != emptyFlow<PagingData<Character>>()) &&
-//                searchState.data.collectAsLazyPagingItems().itemSnapshotList.isEmpty()
-//            )  { searchViewModel.setCharacterErrorState(ErrorType.Api.EmptyListError) }
 
             SearchScreen(
-                searchState = searchViewModel.characterState.value,
+                searchState = searchViewModel.characterState.collectAsState().value,
                 navigateToDetailsScreen = { characterId ->
                     navController.navigate("${Screen.Details.route}/$characterId")
                 },
@@ -59,10 +55,10 @@ fun AppNavHost(
             val characterId = it.arguments?.getString("character_id") ?: ""
             val characterDetailsViewModel = hiltViewModel<CharacterDetailsViewModel>()
 
-            val characterDetailsState = characterDetailsViewModel.characterDetails.value
-            val speciesState = characterDetailsViewModel.speciesState.value
-            val filmsState = characterDetailsViewModel.filmsState.value
-            val homeWorldState = characterDetailsViewModel.homeWorldState.value
+            val characterDetailsState = characterDetailsViewModel.characterDetails.collectAsState().value
+            val speciesState = characterDetailsViewModel.speciesState.collectAsState().value
+            val filmsState = characterDetailsViewModel.filmsState.collectAsState().value
+            val homeWorldState = characterDetailsViewModel.homeWorldState.collectAsState().value
             val characterDetailsData = if(characterDetailsState is UiState.Loaded) characterDetailsState.data else null
 
             val isErrorState = characterDetailsState is UiState.Error || homeWorldState is UiState.Error ||

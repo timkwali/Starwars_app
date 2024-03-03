@@ -72,10 +72,4 @@ object NetworkModule {
     fun provideErrorTypeConverter(): ErrorTypeToErrorTextConverter {
         return ErrorTypeToErrorTextConverterImpl()
     }
-
-    @Provides
-    @Singleton
-    fun provideConnectivityManager(application: Application): ConnectivityManager {
-        return application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    }
 }

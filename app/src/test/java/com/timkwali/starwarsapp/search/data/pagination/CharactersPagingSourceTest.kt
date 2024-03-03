@@ -7,10 +7,10 @@ import com.timkwali.starwarsapp.core.utils.Resource
 import com.timkwali.starwarsapp.core.utils.toErrorType
 import com.timkwali.starwarsapp.search.domain.model.character.CharacterMapper
 import com.timkwali.starwarsapp.search.domain.repository.SearchRepository
-import com.timkwali.starwarsapp.search.utils.pageLoadSize
-import com.timkwali.starwarsapp.search.utils.testSearchQuery
-import com.timkwali.starwarsapp.search.utils.testSearchResponse
-import com.timkwali.starwarsapp.search.utils.totalPage
+import com.timkwali.starwarsapp.core.utils.pageLoadSize
+import com.timkwali.starwarsapp.core.utils.testSearchQuery
+import com.timkwali.starwarsapp.core.utils.testSearchResponse
+import com.timkwali.starwarsapp.core.utils.totalPage
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 
