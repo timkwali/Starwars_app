@@ -57,7 +57,7 @@ import com.timkwali.starwarsapp.details.domain.model.film.Film
 import com.timkwali.starwarsapp.details.domain.model.homeworld.HomeWorld
 import com.timkwali.starwarsapp.details.domain.model.species.Species
 import com.timkwali.starwarsapp.details.presentation.DetailComponent
-import com.timkwali.starwarsapp.details.presentation.components.AppDialog
+import com.timkwali.starwarsapp.core.presentation.components.AppDialog
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)

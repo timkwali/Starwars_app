@@ -1,4 +1,4 @@
-package com.timkwali.starwarsapp.details.presentation.components
+package com.timkwali.starwarsapp.core.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog

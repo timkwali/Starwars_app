@@ -1,6 +1,5 @@
 package com.timkwali.starwarsapp.search.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,7 +52,7 @@ import com.timkwali.starwarsapp.core.presentation.theme.Grey
 import com.timkwali.starwarsapp.core.presentation.theme.Orange
 import com.timkwali.starwarsapp.core.presentation.theme.White
 import com.timkwali.starwarsapp.core.utils.UiState
-import com.timkwali.starwarsapp.details.presentation.components.AppDialog
+import com.timkwali.starwarsapp.core.presentation.components.AppDialog
 import com.timkwali.starwarsapp.search.domain.model.character.Character
 import com.timkwali.starwarsapp.search.presentation.components.CharacterListItem
 import kotlinx.coroutines.delay
