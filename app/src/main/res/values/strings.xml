@@ -16,4 +16,5 @@
     <string name="population">Population</string>
     <string name="films">Films</string>
     <string name="more">more…</string>
+    <string name="error">Error</string>
 </resources>

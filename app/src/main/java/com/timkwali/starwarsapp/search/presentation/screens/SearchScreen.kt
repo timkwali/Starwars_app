@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +54,7 @@ import com.timkwali.starwarsapp.core.presentation.theme.Grey
 import com.timkwali.starwarsapp.core.presentation.theme.Orange
 import com.timkwali.starwarsapp.core.presentation.theme.White
 import com.timkwali.starwarsapp.core.utils.UiState
+import com.timkwali.starwarsapp.details.presentation.components.AppDialog
 import com.timkwali.starwarsapp.search.domain.model.character.Character
 import com.timkwali.starwarsapp.search.presentation.components.CharacterListItem
 import kotlinx.coroutines.delay
@@ -67,6 +70,8 @@ fun SearchScreen(
     searchCharacters: (searchQuery: String) -> Unit
 ) {
     var showError by rememberSaveable { mutableStateOf(false) }
+    var dialogText by rememberSaveable { mutableStateOf("") }
+    var showAlertDialog by rememberSaveable{ mutableStateOf(false) }
     val controller = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = searchState is UiState.Error) {
@@ -86,6 +91,14 @@ fun SearchScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
+            AppDialog(
+                onDismissRequest = { showAlertDialog = false },
+                onConfirmation = { showAlertDialog = false },
+                dialogTitle = stringResource(id = R.string.error),
+                dialogText = dialogText,
+                icon = Icons.Filled.Warning,
+                isVisible = showAlertDialog
+            )
             Box(
                 modifier = Modifier
                     .padding(it)
@@ -98,6 +111,7 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -139,6 +153,11 @@ fun SearchScreen(
 
                     if(searchState is UiState.Loaded) {
                         val lazyPagingItems = searchState.data.collectAsLazyPagingItems()
+                        showAlertDialog = lazyPagingItems.loadState.source.refresh is LoadState.Error
+                        if(lazyPagingItems.loadState.source.refresh is LoadState.Error) {
+                            dialogText = (lazyPagingItems.loadState.refresh as LoadState.Error)
+                                .error.localizedMessage ?: stringResource(id = R.string.error_general)
+                        }
 
                         Spacer(modifier = Modifier.height(20.dp))
                         LazyColumn {
@@ -155,6 +174,7 @@ fun SearchScreen(
                                 }
                             }
                         }
+
                         if(lazyPagingItems.loadState.append == LoadState.Loading) {
                             CircularProgressIndicator(color = Orange, modifier = Modifier.size(20.dp))
                         }

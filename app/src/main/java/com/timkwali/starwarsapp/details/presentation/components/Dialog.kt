@@ -29,7 +29,7 @@ fun AppDialog(
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector,
-    isVisible: Boolean
+    isVisible: Boolean = true
 ) {
     if(isVisible) {
         AlertDialog(
@@ -61,7 +61,7 @@ fun AppDialog(
                     onClick = { onConfirmation() }
                 ) { Text("Confirm", style = typography.titleSmall, color = Orange) }
             },
-            containerColor = Black
+            containerColor = Black,
         )
     }
 }
